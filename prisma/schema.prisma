@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "windows", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  status    Status   @default(PENDING)
+  createdAt DateTime @default(now())
+  orders    Order[]
+}
+
+model TokenCategory {
+  id       Int             @id @default(autoincrement())
+  name     String          @unique
+  products TokenProduct[]
+  orders Order[]
+}
+
+model TokenProduct {
+  id          Int            @id @default(autoincrement())
+  title       String
+  price       Float
+  imageUrl    String
+  description String
+  categoryId  Int
+
+  category    TokenCategory  @relation(fields: [categoryId], references: [id])
+}
+
+
+model Order {
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  tokenCategoryId Int
+  createdAt       DateTime @default(now())
+  status          String   @default("PENDING")
+
+  user            User     @relation(fields: [userId], references: [id])
+  tokenCategory   TokenCategory @relation(fields: [tokenCategoryId], references: [id])
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum Status {
+  PENDING
+  ACCEPTED
+  REJECTED
+}

@@ -1,0 +1,221 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "Fan Token API",
+      "version": "1.0.0",
+      "description": "API para la gestión de Fan Tokens (VIP, GOLD, BLACK)"
+    },
+    "servers": [
+      {
+        "url": "http://localhost:3000",
+        "description": "Servidor local"
+      }
+    ],
+    "paths": {
+      "/products": {
+        "get": {
+          "summary": "Obtener todos los productos",
+          "tags": ["Products"],
+          "responses": {
+            "200": {
+              "description": "Lista de todos los productos con su categoría"
+            }
+          }
+        },
+        "post": {
+          "summary": "Crear un nuevo producto",
+          "tags": ["Products"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": { "type": "string" },
+                    "price": { "type": "number" },
+                    "imageUrl": { "type": "string" },
+                    "description": { "type": "string" },
+                    "categoryId": { "type": "integer" }
+                  },
+                  "required": ["title", "price", "imageUrl", "description", "categoryId"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": { "description": "Producto creado exitosamente" },
+            "500": { "description": "Error al crear producto" }
+          }
+        }
+      },
+      "/products/{id}": {
+        "put": {
+          "tags": ["Products"],
+          "summary": "Actualizar producto",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "id",
+              "required": true,
+              "schema": { "type": "integer" }
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": { "type": "string" },
+                    "price": { "type": "number" },
+                    "imageUrl": { "type": "string" },
+                    "description": { "type": "string" },
+                    "categoryId": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": { "description": "Producto actualizado" },
+            "404": { "description": "Producto no encontrado" }
+          }
+        },
+        "delete": {
+          "tags": ["Products"],
+          "summary": "Eliminar producto",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "id",
+              "required": true,
+              "schema": { "type": "integer" }
+            }
+          ],
+          "responses": {
+            "204": { "description": "Producto eliminado" },
+            "404": { "description": "Producto no encontrado" }
+          }
+        }
+      },
+      "/tokens/{id}/products": {
+        "get": {
+          "summary": "Obtener productos por categoría",
+          "tags": ["Tokens"],
+          "parameters": [
+            {
+              "in": "path",
+              "name": "id",
+              "schema": { "type": "integer" },
+              "required": true,
+              "description": "ID de la categoría"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Lista de productos pertenecientes a la categoría"
+            }
+          }
+        }
+      },
+      "/auth/register": {
+        "post": {
+          "summary": "Registrar nuevo usuario",
+          "tags": ["Auth"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "email": { "type": "string", "format": "email" },
+                    "password": { "type": "string", "format": "password" }
+                  },
+                  "required": ["email", "password"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": { "description": "Usuario creado correctamente" },
+            "409": { "description": "El usuario ya existe" }
+          }
+        }
+      },
+      "/auth/login": {
+        "post": {
+          "summary": "Login de usuario",
+          "tags": ["Auth"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "email": { "type": "string", "format": "email" },
+                    "password": { "type": "string", "format": "password" }
+                  },
+                  "required": ["email", "password"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": { "description": "Login exitoso, retorna token JWT" },
+            "401": { "description": "Credenciales inválidas" }
+          }
+        }
+      },
+
+      "/users": {
+      "get": {
+      "summary": "Obtener todos los usuarios",
+      "tags": ["Users"],
+      "security": [{ "bearerAuth": [] }],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "status",
+          "schema": {
+            "type": "string",
+            "enum": ["PENDING", "ACCEPTED", "REJECTED"]
+          },
+          "required": false,
+          "description": "Filtrar por estado del usuario"
+        },
+        {
+          "in": "query",
+          "name": "role",
+          "schema": {
+            "type": "string",
+            "enum": ["USER", "ADMIN"]
+          },
+          "required": false,
+          "description": "Filtrar por rol del usuario"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Lista de usuarios con sus estados"
+        },
+          "500": {
+            "description": "Error al obtener usuarios"
+          }
+        }
+      }
+    },
+    "components": {
+     "securitySchemes": {
+        "bearerAuth": {
+         "type": "http",
+          "scheme": "bearer"
+        }
+      }
+    }
+  }
+}
+  

@@ -1,0 +1,46 @@
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const { createUserService, findUserByEmailService } = require("../Services/auth.service");
+
+const register = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const existing = await findUserByEmailService(email);
+    if (existing) {
+      return res.status(400).json({ error: "El usuario ya existe." });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await createUserService(email, hashedPassword);
+
+    res.status(201).json({ message: "Usuario creado. Esperando aprobación.", user });
+  } catch (error) {
+    console.error("❌ Register error:", error);
+    res.status(500).json({ error: "Error en el registro." });
+  }
+};
+
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await findUserByEmailService(email);
+
+    if (!user) return res.status(404).json({ error: "Usuario no encontrado." });
+    if (user.status !== "ACCEPTED") return res.status(403).json({ error: "Usuario no aprobado aún." });
+
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) return res.status(401).json({ error: "Contraseña incorrecta." });
+
+    const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    res.json({ token, user: { id: user.id, email: user.email, role: user.role } });
+  } catch (error) {
+    console.error("❌ Login error:", error);
+    res.status(500).json({ error: "Error en el login." });
+  }
+};
+
+module.exports = { register, login };
