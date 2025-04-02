@@ -5,7 +5,7 @@ const getAllTokens = async (req, res) => {
     const tokens = await getAllTokensService();
     res.json(tokens);
   } catch (err) {
-    res.status(500).json({ error: "Error al obtener los tokens." });
+    res.status(500).json({ error: "Error fetching tokens." });
   }
 };
 
@@ -16,7 +16,7 @@ const getProductsByCategory = async (req, res) => {
     res.json(products);
   } catch (err) {
     console.error("❌ Error en getProductsByCategory:", err);
-    res.status(500).json({ error: "Error al obtener productos por categoría." });
+    res.status(500).json({ error: "Error fetching products by category." });
   }
 };
 

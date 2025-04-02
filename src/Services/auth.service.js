@@ -5,11 +5,13 @@ const findUserByEmailService = async (email) => {
   return await prisma.user.findUnique({ where: { email } });
 };
 
-const createUserService = async (email, password) => {
+const createUserService = async ({ email, password, fullName, phone }) => {
   return await prisma.user.create({
     data: {
       email,
       password,
+      fullName,
+      phone,
       role: "USER",
       status: "PENDING"
     },

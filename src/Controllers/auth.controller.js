@@ -4,20 +4,20 @@ const { createUserService, findUserByEmailService } = require("../Services/auth.
 
 const register = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, fullName, phone } = req.body;
 
     const existing = await findUserByEmailService(email);
     if (existing) {
-      return res.status(400).json({ error: "El usuario ya existe." });
+      return res.status(400).json({ error: "User already exists." });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await createUserService(email, hashedPassword);
+    const user = await createUserService({ email, password: hashedPassword, fullName, phone });
 
-    res.status(201).json({ message: "Usuario creado. Esperando aprobación.", user });
+    res.status(201).json({ message:  "User created. Awaiting approval.", user });
   } catch (error) {
     console.error("❌ Register error:", error);
-    res.status(500).json({ error: "Error en el registro." });
+    res.status(500).json({ error:  "Registration error."});
   }
 };
 
@@ -26,11 +26,11 @@ const login = async (req, res) => {
     const { email, password } = req.body;
     const user = await findUserByEmailService(email);
 
-    if (!user) return res.status(404).json({ error: "Usuario no encontrado." });
-    if (user.status !== "ACCEPTED") return res.status(403).json({ error: "Usuario no aprobado aún." });
+    if (!user) return res.status(404).json({ error: "User not found." });
+    if (user.status !== "ACCEPTED") return res.status(403).json({ error: "User not approved yet." });
 
     const valid = await bcrypt.compare(password, user.password);
-    if (!valid) return res.status(401).json({ error: "Contraseña incorrecta." });
+    if (!valid) return res.status(401).json({ error: "Incorrect password." });
 
     const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
       expiresIn: "7d",
@@ -39,7 +39,7 @@ const login = async (req, res) => {
     res.json({ token, user: { id: user.id, email: user.email, role: user.role } });
   } catch (error) {
     console.error("❌ Login error:", error);
-    res.status(500).json({ error: "Error en el login." });
+    res.status(500).json({ error: "Login error."  });
   }
 };
 

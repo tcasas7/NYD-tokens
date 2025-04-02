@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "windows", "debian-openssl-3.0.x"]
 }
 
@@ -12,6 +12,8 @@ model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
   password  String
+  fullName  String   
+  phone     String 
   role      Role     @default(USER)
   status    Status   @default(PENDING)
   createdAt DateTime @default(now())
@@ -19,33 +21,48 @@ model User {
 }
 
 model TokenCategory {
-  id       Int             @id @default(autoincrement())
-  name     String          @unique
+  id       Int            @id @default(autoincrement())
+  name     String         @unique
   products TokenProduct[]
-  orders Order[]
 }
 
 model TokenProduct {
-  id          Int            @id @default(autoincrement())
+  id          Int    @id @default(autoincrement())
   title       String
   price       Float
   imageUrl    String
   description String
   categoryId  Int
 
-  category    TokenCategory  @relation(fields: [categoryId], references: [id])
+  category   TokenCategory @relation(fields: [categoryId], references: [id])
+  orderItems OrderItem[]
 }
 
+enum OrderStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model OrderItem {
+  id        Int @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  quantity  Int @default(1)
+
+  order   Order        @relation(fields: [orderId], references: [id])
+  product TokenProduct @relation(fields: [productId], references: [id])
+}
 
 model Order {
-  id              Int      @id @default(autoincrement())
+  id              Int         @id @default(autoincrement())
   userId          Int
-  tokenCategoryId Int
-  createdAt       DateTime @default(now())
-  status          String   @default("PENDING")
+  createdAt       DateTime    @default(now())
+  status          OrderStatus @default(PENDING)
+  total           Float       @default(0)
 
-  user            User     @relation(fields: [userId], references: [id])
-  tokenCategory   TokenCategory @relation(fields: [tokenCategoryId], references: [id])
+  user  User        @relation(fields: [userId], references: [id])
+  items OrderItem[]
 }
 
 enum Role {

@@ -4,13 +4,14 @@ const prisma = new PrismaClient();
 async function main() {
     const existing = await prisma.tokenProduct.findFirst();
     if (existing) {
-      console.log("🟡 Productos ya existen, omitiendo seed.");
+      console.log("🟡 Products already exist, skipping seed.");
       return;
     }    
+
   const categories = [
     { name: "VIP" },
     { name: "GOLD" },
-    { name: "BLACK" },
+    { name: "ESSENTIAL" },
   ];
 
   // Crear categorías
@@ -24,36 +25,36 @@ async function main() {
 
   const vip = await prisma.tokenCategory.findUnique({ where: { name: "VIP" } });
   const gold = await prisma.tokenCategory.findUnique({ where: { name: "GOLD" } });
-  const black = await prisma.tokenCategory.findUnique({ where: { name: "BLACK" } });
+  const essential = await prisma.tokenCategory.findUnique({ where: { name: "ESSENTIAL" } });
 
   const products = [
     {
       title: "Meet & Greet",
       price: 1000,
       imageUrl: "https://example.com/vip1.jpg",
-      description: "Encuentro exclusivo con jugadores",
+      description: "Exclusive meet and greet with players",
       categoryId: vip.id,
     },
     {
-      title: "Camiseta Firmada",
+      title: "Signed Shirt",
       price: 500,
       imageUrl: "https://example.com/vip2.jpg",
-      description: "Camiseta oficial autografiada",
+      description: "Official autographed jersey",
       categoryId: vip.id,
     },
     {
-      title: "Acceso Preferencial",
+      title: "Preferential Access",
       price: 300,
       imageUrl: "https://example.com/gold1.jpg",
-      description: "Entrada anticipada al estadio",
+      description: "Early entrance to the stadium",
       categoryId: gold.id,
     },
     {
-      title: "Sorteo mensual",
+      title: "Monthly raffle",
       price: 150,
-      imageUrl: "https://example.com/black1.jpg",
-      description: "Participación en sorteos exclusivos",
-      categoryId: black.id,
+      imageUrl: "https://example.com/essential1.jpg",
+      description: "Participation in exclusive raffles",
+      categoryId: essential.id,
     },
   ];
 

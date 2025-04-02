@@ -6,6 +6,8 @@ const getAllUsersService = async () => {
       select: {
         id: true,
         email: true,
+        fullName: true, 
+        phone: true,
         role: true,
         status: true,
         createdAt: true,
@@ -13,4 +15,12 @@ const getAllUsersService = async () => {
     });
   };
   
-  module.exports = { getAllUsersService };
+  const updateUserStatusService = async (id, status) => {
+    return await prisma.user.update({
+      where: { id },
+      data: { status },
+    });
+  };
+  
+
+  module.exports = { getAllUsersService, updateUserStatusService };

@@ -3,7 +3,7 @@
     "info": {
       "title": "Fan Token API",
       "version": "1.0.0",
-      "description": "API para la gestión de Fan Tokens (VIP, GOLD, BLACK)"
+      "description": "API para la gestión de Fan Tokens (VIP, GOLD, ESSENTIAL)"
     },
     "servers": [
       {
@@ -131,10 +131,12 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "fullName": { "type": "string" },
                     "email": { "type": "string", "format": "email" },
-                    "password": { "type": "string", "format": "password" }
+                    "password": { "type": "string", "format": "password" },
+                    "phone": { "type": "string", "example": "123-456-7890" }
                   },
-                  "required": ["email", "password"]
+                  "required": ["fullName","email", "password", "phone"]
                 }
               }
             }
@@ -208,6 +210,53 @@
         }
       }
     },
+    "/users/{id}/status": {
+  "patch": {
+    "summary": "Update user status (approve/reject)",
+    "tags": ["Users"],
+    "security": [{ "bearerAuth": [] }],
+    "parameters": [
+      {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "integer"
+        },
+        "description": "User ID"
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": ["PENDING", "ACCEPTED", "REJECTED"]
+              }
+            },
+            "required": ["status"]
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "User status updated successfully"
+      },
+      "400": {
+        "description": "Missing status"
+      },
+      "500": {
+        "description": "Failed to update status"
+      }
+    }
+  }
+},
+
     "components": {
      "securitySchemes": {
         "bearerAuth": {
@@ -215,7 +264,108 @@
           "scheme": "bearer"
         }
       }
+    },
+    "/orders": {
+  "post": {
+    "summary": "Crear una nueva orden",
+    "tags": ["Orders"],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "userId": { "type": "integer" },
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "productId": { "type": "integer" },
+                    "quantity": { "type": "integer" }
+                  },
+                  "required": ["productId", "quantity"]
+                }
+              }
+            },
+            "required": ["userId", "items"]
+          }
+        }
+      }
+    },
+    "responses": {
+      "201": { "description": "Orden creada correctamente" },
+      "400": { "description": "La orden no puede estar vacía" },
+      "500": { "description": "Error del servidor" }
     }
+  },
+  "get": {
+    "summary": "Obtener todas las órdenes (admin)",
+    "tags": ["Orders"],
+    "security": [{ "bearerAuth": [] }],
+    "responses": {
+      "200": { "description": "Lista de órdenes" },
+      "500": { "description": "Error al obtener órdenes" }
+    }
+  }
+},
+"/orders/user/{id}": {
+  "get": {
+    "summary": "Obtener historial de órdenes del usuario",
+    "tags": ["Orders"],
+    "security": [{ "bearerAuth": [] }],
+    "parameters": [
+      {
+        "in": "path",
+        "name": "id",
+        "required": true,
+        "schema": { "type": "integer" }
+      }
+    ],
+    "responses": {
+      "200": { "description": "Órdenes del usuario" },
+      "500": { "description": "Error al obtener órdenes" }
+    }
+  }
+},
+"/orders/{id}/status": {
+  "put": {
+    "summary": "Actualizar estado de orden (admin)",
+    "tags": ["Orders"],
+    "security": [{ "bearerAuth": [] }],
+    "parameters": [
+      {
+        "in": "path",
+        "name": "id",
+        "required": true,
+        "schema": { "type": "integer" }
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": ["PENDING", "ACCEPTED", "REJECTED"]
+              }
+            },
+            "required": ["status"]
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": { "description": "Orden actualizada" },
+      "500": { "description": "Error al actualizar orden" }
+    }
+  }
+}
+
   }
 }
   

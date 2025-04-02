@@ -6,7 +6,7 @@ const getAllProducts = async (req, res) => {
     res.json(products);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Error al obtener productos." });
+    res.status(500).json({ error: "Error fetching products." });
   }
 };
 
@@ -17,7 +17,7 @@ const createProduct = async (req, res) => {
     res.status(201).json(newProduct);
   } catch (err) {
     console.error("❌ createProduct error:", err);
-    res.status(500).json({ error: "Error al crear producto." });
+    res.status(500).json({ error: "Error creating product."});
   }
 };
 
@@ -27,7 +27,7 @@ const updateProduct = async (req, res) => {
     res.status(200).json(updated);
   } catch (err) {
     console.error("❌ updateProduct error:", err);
-    res.status(500).json({ error: "Error al actualizar producto." });
+    res.status(500).json({ error: "Error updating product."});
   }
 };
 
@@ -37,7 +37,7 @@ const deleteProduct = async (req, res) => {
     res.status(204).send();
   } catch (err) {
     console.error("❌ deleteProduct error:", err);
-    res.status(500).json({ error: "Error al eliminar producto." });
+    res.status(500).json({ error: "Error deleting product." });
   }
 };
 
