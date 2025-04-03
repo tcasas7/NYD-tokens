@@ -7,6 +7,8 @@ const productRoutes = require("./Routes/product.routes");
 const authRoutes = require("./Routes/auth.routes");
 const userRoutes = require("./Routes/user.routes");
 const orderRoutes = require('./Routes/order.routes');
+const uploadRoutes = require("./Routes/uploads.routes")
+
 
 const app = express();
 
@@ -21,6 +23,10 @@ app.use(cors({
 }));
 
 app.use(express.json());
+
+app.use("/uploads", express.static("uploads"))
+
+app.use("/api", uploadRoutes)
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 

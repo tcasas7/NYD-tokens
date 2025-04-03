@@ -49,6 +49,52 @@
           }
         }
       },
+            "/api/upload": {
+        "post": {
+          "summary": "Subir una imagen de producto",
+          "tags": ["Products"],
+          "consumes": ["multipart/form-data"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "multipart/form-data": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "image": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  },
+                  "required": ["image"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Imagen subida correctamente",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "imageUrl": {
+                        "type": "string",
+                        "example": "/uploads/helmet-2024.png"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "No se envió ninguna imagen"
+            }
+          }
+        }
+      }
+      ,
       "/products/{id}": {
         "put": {
           "tags": ["Products"],
